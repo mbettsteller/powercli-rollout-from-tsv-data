@@ -1,4 +1,0 @@
-vmname	resourcepool	vlan	template	customspec	datastore
-mbtest001-mb-mb	mb-resourcepool-01	VLAN001	mb-template001	web-template001	SATA-Datatore-Cluster-RZ001
-mbtest002-mb-mb	mb-resourcepool-01	VLAN001	mb-template001	web-template001	SATA-Datatore-Cluster-RZ001
-mbtest003-mb-mb	mb-resourcepool-02	VLAN002	mb-template002	db-template001	SSD-Datatore-Cluster-RZ001
