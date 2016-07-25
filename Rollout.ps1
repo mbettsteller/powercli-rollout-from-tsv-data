@@ -37,7 +37,7 @@ Function Main{
 
     foreach($server in $ServerListe.Keys)
     {
-        New-VM -Name $ServerListe.$server.name -Server $Session -Template (Get-Template -Name $ServerListe.$server.template -Server $Session) -ResourcePool $ServerListe.$server.resourcepool -Datastore $ServerListe.$server.datastore -OSCustomizationSpec $Serverliste.$server.customspec -RunAsync:$true
+        New-VM -Location (Get-Folder -Name $ServerListe.$server.vmfolder -Type VM) -Name $ServerListe.$server.name -Server $Session -Template (Get-Template -Name $ServerListe.$server.template -Server $Session) -ResourcePool $ServerListe.$server.resourcepool -Datastore $ServerListe.$server.datastore -OSCustomizationSpec $Serverliste.$server.customspec -RunAsync:$true
     }
 
     #Once stuff is created, try to do your work, staring by setting the VLAN
@@ -74,18 +74,6 @@ Function Main{
                     -Verbose `
                     -RunAsync:$false `
                     -ErrorAction SilentlyContinue)|Out-Null
-            }
-            while($? -eq $false)
-        }
-        #try to move the VM in a folder
-        Write-Output $("trying to move vm " + $ServerListe.$server.name)
-        Move-VM -VM $ServerListe.$server.name -Destination (Get-Folder -Name $ServerListe.$server.vmfolder -Type VM) -Confirm:$false -RunAsync:$false -ErrorAction SilentlyContinue|Out-Null
-        #if it fails enter a loop and try until it succeeds! The New-VM may still be copying the files and is not ready yet!
-        if ($? -eq $false){
-            do{
-                sleep 5
-                Write-Output $("trying to move vm " + $ServerListe.$server.name)
-                Move-VM -VM $ServerListe.$server.name -Destination (Get-Folder -Name $ServerListe.$server.vmfolder -Type VM) -Confirm:$false -RunAsync:$false -ErrorAction SilentlyContinue|Out-Null
             }
             while($? -eq $false)
         }
