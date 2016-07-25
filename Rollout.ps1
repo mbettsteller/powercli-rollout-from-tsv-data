@@ -14,7 +14,7 @@ Function Main{
 
     #On demand: asking the admin for vcenter credentials at each run of the script
     $credential = Get-Credential -Message "Enter Credentials for $vcenter" -UserName "yourusername@vsphere6.local"
-    $Session = Connect-VIServer -Server $vcenter -Force -Credential $vcenterCredential
+    $Session = Connect-VIServer -Server $vcenter -Force -Credential $credential
 
     if(!$Session.IsConnected){
         $Session = Connect-VIServer -Server $vcenter -Force -Credential $credential
@@ -28,7 +28,8 @@ Function Main{
                 vlan=$_.vlan;
                 resourcepool=$_.resourcepool;
                 customspec=$_.customspec;
-                datastore=$_.datastore}
+                datastore=$_.datastore;
+                vmfolder=$_.vmfolder}
 
                 $ServerListe+=@{$server.name=$server}
         }
@@ -73,6 +74,18 @@ Function Main{
                     -Verbose `
                     -RunAsync:$false `
                     -ErrorAction SilentlyContinue)|Out-Null
+            }
+            while($? -eq $false)
+        }
+        #try to move the VM in a folder
+        Write-Output $("trying to move vm " + $ServerListe.$server.name)
+        Move-VM -VM $ServerListe.$server.name -Destination (Get-Folder -Name $ServerListe.$server.vmfolder -Type VM) -Confirm:$false -RunAsync:$false -ErrorAction SilentlyContinue|Out-Null
+        #if it fails enter a loop and try until it succeeds! The New-VM may still be copying the files and is not ready yet!
+        if ($? -eq $false){
+            do{
+                sleep 5
+                Write-Output $("trying to move vm " + $ServerListe.$server.name)
+                Move-VM -VM $ServerListe.$server.name -Destination (Get-Folder -Name $ServerListe.$server.vmfolder -Type VM) -Confirm:$false -RunAsync:$false -ErrorAction SilentlyContinue|Out-Null
             }
             while($? -eq $false)
         }
