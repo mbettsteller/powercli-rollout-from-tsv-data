@@ -22,7 +22,7 @@ Function Main{
 
     #The 
     $ServerListe=@{}
-    Import-Csv "S:\rollout.tsv" -Delimiter "`t"| ForEach-Object {
+    Import-Csv "rollout.tsv" -Delimiter "`t"| ForEach-Object {
             $server = @{name=$_.vmname;
                 template=$_.template;
                 vlan=$_.vlan;
